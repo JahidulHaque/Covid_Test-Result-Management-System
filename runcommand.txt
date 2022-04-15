@@ -1,0 +1,76 @@
+To create our Project:(CMD){
+
+1)cd Desktop
+2)cd corona
+3)django-admin startproject corona
+4)python manage.py startapp coronalab
+5)python manage.py runserver
+
+}
+
+Database creation:{
+
+-> models.py
+1)python manage.py makemigrations
+2)python manage.py migrate
+3)(Optional : python manage.py createsuperuser [alt: username:admin pass:admin])
+4)python manage.py runserver
+
+}
+rendering Templete:{
+
+1)coronalab(app) -> templates (create) -> coronalab (create) -> All Html files.(example:home.html)
+
+2) views.py (view_func)
+def functionname(ex:home)(request):
+                   		
+
+	return render(request,'coronalab/home.html', )
+
+3) urls.py (url path):-
+ path('',views.functionname,name='home')
+
+4) python manage.py runserver (CMD)
+
+} 
+
+
+Data Accessing:
+from django.db.models import Sum
+def home(request):
+	worldupdate=WorldUpdate.objects.all()
+	total_pos = worldupdate.aggregate(Sum('dailypositive'))
+	total_rec = worldupdate.aggregate(Sum('dailyrecovered'))
+	total_death = worldupdate.aggregate(Sum('dailydeath'))
+
+	bdupdate=BangladeshUpdate.object.all()
+	
+	context={'tatal_pos':total_pos,'total_rec':total_rec,'total_death':total_death,'':bd_pos,'':bd_rec}
+	return render(request, "coronalab/home.html",context)
+ 
+.html:
+    {{total_pos.key_name| safe}}
+
+from django.http import JsonResponse
+
+
+def worldstatus(request):
+	worddate = []
+	worlddata = []
+	worldupdate = WorldUpdate.objects.all()
+	
+	for i in worldupdate:
+		worlddate.append(i.date)
+		worlddata.append(i.dailypositive)
+	
+	data = {'worlddate':worlddate,'worlddata':worlddata}
+	return JsonResponse()
+
+urls.py:
+
+path('world-pos-status/',views.worldstatus,name='world-pos-status')
+
+.html:
+   data.worlddate
+   data.worlddata
+		
